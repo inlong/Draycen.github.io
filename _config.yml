@@ -15,7 +15,7 @@ RSS: false
 weibo_username:     Draycen
 zhihu_username:     Draycen
 github_username:    Draycen
-#twitter_username:  huxpro
+#twitter_username:  Draycen
 facebook_username:  Draycen
 # linkedin_username:  firstname-lastname-idxxxx
 
@@ -51,7 +51,7 @@ kramdown:
 #disqus_username: _your_disqus_short_name_
 
 # Duoshuo settings
-duoshuo_username: huxblog
+duoshuo_username: Draycen
 # Share component is depend on Comment so we can NOT use share only.
 duoshuo_share: true                     # set to false if you want to use Comment without Sharing
 
