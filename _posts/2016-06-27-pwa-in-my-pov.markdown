@@ -2,7 +2,7 @@
 layout:     keynote
 title:      "Progressive Web App 之我见"
 subtitle:   "Slides: Progressive Web App, in my points of view"
-iframe:     "http://huangxuan.me/pwa-in-my-pov/"
+iframe:     "http://liyinlong/pwa-in-my-pov/"
 date:       2016-06-05
 author:     "Hux"
 tags:
