@@ -15,7 +15,7 @@ tags:
 
 ## 前言
 
-Draycen 的 Blog 就这么开通了。
+Draycen 的 Blog 从SAE搬到Github了。
 
 [跳过废话，直接看技术实现 ](#build) 
 
