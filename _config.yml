@@ -62,7 +62,7 @@ duoshuo_share: true                     # set to false if you want to use Commen
 # Baidu Analytics
 ba_track_id: 7413456ecc799f1d8f737ab89da86e44
 # Google Analytics
-ga_track_id: 'UA-49627206-1'            # Format: UA-xxxxxx-xx
+ga_track_id: 'UA-81455732-1'            # Format: UA-xxxxxx-xx
 ga_domain: liyinlong.com
 
 
