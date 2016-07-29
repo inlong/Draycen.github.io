@@ -1,0 +1,283 @@
+---
+layout:     post
+title:      "性能测试"
+subtitle:   " \"后台性能测试不可不知的二三事\""
+date:       2016-07-30 12:00:00
+author:     "Draycen"
+header-img: "img/post-bg-2015.jpg"
+catalog: true
+tags:
+    - 性能测试
+---
+
+> “xing. ”
+
+&emsp;&emsp;某月黑风高之夜，某打车平台上线了一大波（G+）优惠活动，众人纷纷下单。于是乎，该打车平台使用的智能提示服务扛不住直接趴窝了（如下图）。事后，负责智能提示服务开发和运维的有关部门开会后决定：必须对智能提示服务进行一次全面深入的性能摸底，立刻！现在！马上！
+![aa](http://7xwwww.com1.z0.glb.clouddn.com/QQ%E6%88%AA%E5%9B%BE20160729102446.png)
+
+&emsp;&emsp;那么一大坨问题就迎面而来：对于智能提示这样的后台服务，性能测试过程中应该关心那些指标？这些指标代表什么含义？这些指标的通过标准是什么？下面将为您一一解答。
+
+##概述
+&emsp;&emsp;不同人群关注的性能指标各有侧重。后台服务接口的调用者一般只关心吞吐量、响应时间等外部指标。后台服务的所有者不仅仅关注外部指标，还会关注CPU、内存、负载等内部指标。
+
+&emsp;&emsp;拿某打车平台来说，它所关心的是智能提示的外部指标能不能抗住因大波优惠所导致的流量激增。而对于智能提示服务的开发、运维、测试人员，不仅仅关注外部指标，还会关注CPU、内存、IO等内部指标，以及部署方式、服务器软硬件配置等运维相关事项。
+
+##外部指标
+从外部看，性能测试主要关注如下三个指标:
+
+* 吞吐量：每秒钟系统能够处理的请求数、任务数。
+* 响应时间：服务处理一个请求或一个任务的耗时。
+* 错误率：一批请求中结果出错的请求所占比例。
+
+&emsp;&emsp;响应时间的指标取决于具体的服务。如智能提示一类的服务，返回的数据有效周期短（用户多输入一个字母就需要重新请求），对实时性要求比较高，响应时间的上限一般在100ms以内。而导航一类的服务，由于返回结果的使用周期比较长（整个导航过程中），响应时间的上限一般在2-5s。
+
+&emsp;&emsp;对于响应时间的统计，应从均值、.90、.99、分布等多个角度统计，而不仅仅是给出均值。下图是响应时间统计的一个例子
+
+![a](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzk7bmV6vibCiafQFJuK5xvM7iajOnFoX3ZJpMs0wiakqzIVibtbIoiaib2cVyA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+&emsp;&emsp;吞吐量的指标受到响应时间、服务器软硬件配置、网络状态等多方面因素影响。
+
+* 吞吐量越大，响应时间越长。
+* 服务器硬件配置越高，吞吐量越大。
+* 网络越差，吞吐量越小。
+
+&emsp;&emsp;在低吞吐量下的响应时间的均值、分布比较稳定，不会产生太大的波动。
+
+&emsp;&emsp;在高吞吐量下，响应时间会随着吞吐量的增长而增长，增长的趋势可能是线性的，也可能接近指数的。当吞吐量接近系统的峰值时，响应时间会出现激增。
+
+&emsp;&emsp;错误率和服务的具体实现有关。通常情况下，由于网络超时等外部原因造成的错误比例不应超过5%%，由于服务本身导致的错误率不应超过1% 。
+
+##内部指标
+
+&emsp;&emsp;从服务器的角度看，性能测试主要关注CPU、内存、服务器负载、网络、磁盘IO等
+>CPU
+
+&emsp;&emsp;后台服务的所有指令和数据处理都是由CPU负责，服务对CPU的利用率对服务的性能起着决定性的作用。
+
+&emsp;&emsp;Linux系统的CPU主要有如下几个维度的统计数据:
+
+* us：用户态使用的cpu时间百分比
+* ni：用做nice加权的进程分配的用户态cpu时间百分比
+* sy：系统态使用的cpu时间百分比
+* id：空闲的cpu时间百分比
+* wa：cpu等待IO完成时间百分比
+* hi：硬中断消耗时间百分比
+* si：软中断消耗时间百分比
+
+&emsp;&emsp;下图是线上开放平台转发服务某台服务器上top命令的输出，下面以这个服务为例对CPU各项指标进行说明.
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzBuUYpAEiayPOgcwy0NbEVLcGHc3KG9j6tPqiaiaScN3kTfWQBPCNrHlVQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+&emsp;&emsp;us & sy：大部分后台服务使用的CPU时间片中us和sy的占用比例是最高的。同时这两个指标又是互相影响的，us的比例高了，sy的比例就低，反之亦然。通常sy比例过高意味着被测服务在用户态和系统态之间切换比较频繁，此时系统整体性能会有一定下降。另外，在使用多核CPU的服务器上，CPU 0负责CPU各核间的调度，CPU 0上的使用率过高会导致其他CPU核心之间的调度效率变低。因此测试过程中CPU 0需要重点关注。
+
+&emsp;&emsp;ni：每个Linux进程都有个优先级，优先级高的进程有优先执行的权利，这个叫做pri。进程除了优先级外，还有个优先级的修正值。这个修正值就叫做进程的nice值。一般来说，被测服务和服务器整体的ni值不会很高。如果测试过程中ni的值比较高，需要从服务器Linux系统配置、被测服务运行参数查找原因
+
+&emsp;&emsp;id：线上服务运行过程中，需要保留一定的id冗余来应对突发的流量激增。在性能测试过程中，如果id一直很低，吞吐量上不去，需要检查被测服务线程/进程配置、服务器系统配置等。
+
+&emsp;&emsp;wa：磁盘、网络等IO操作会导致CPU的wa指标提高。通常情况下，网络IO占用的wa资源不会很高，而频繁的磁盘读写会导致wa激增。如果被测服务不是IO密集型的服务，那需要检查被测服务的日志量、数据载入频率等。
+
+&emsp;&emsp;hi & si：硬中断是外设对CPU的中断，即外围硬件发给CPU或者内存的异步信号就是硬中断信号；软中断由软件本身发给操作系统内核的中断信号。通常是由硬中断处理程序或进程调度程序对操作系统内核的中断，也就是我们常说的系统调用(System Call)。在性能测试过程中，hi会有一定的CPU占用率，但不会太高。对于IO密集型的服务，si的CPU占用率会高一些。
+
+>内存
+
+&emsp;&emsp;性能测试过程中对内存监控的主要目的是检查被测服务所占用内存的波动情况。
+
+&emsp;&emsp;在Linux系统中有多个命令可以获取指定进程的内存使用情况，最常用的是top命令，如下图所示
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzor2cnuUkXBErptD0HT1wRHXH1NUWuBvtLjeyUhxCpDe8yiarXh6rQsA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+
+* VIRT：进程所使用的虚拟内存的总数。它包括所有的代码，数据和共享库，加上已换出的页面，所有已申请的总内存空间
+
+* RES：进程正在使用的没有交换的物理内存（栈、堆），申请内存后该内存段已被重新赋值
+
+* SHR：进程使用共享内存的总数。该数值只是反映可能与其它进程共享的内存，不代表这段内存当前正被其他进程使用 
+
+* SWAP：进程使用的虚拟内存中被换出的大小，交换的是已经申请，但没有使用的空间，包括（栈、堆、共享内存）
+
+* DATA：进程除可执行代码以外的物理内存总量，即进程栈、堆申请的总空间
+
+&emsp;&emsp;从上面的解释可以看出，测试过程中主要监控RES和VIRT，对于使用了共享内存的多进程架构服务，还需要监沙发控SHR。
+
+>LOAD（服务器负载）
+
+&emsp;&emsp;Linux的系统负载指运行队列的平均长度，也就是等待CPU的平均进程数
+
+&emsp;&emsp;从服务器负载的定义可以看出，服务器运行最理想的状态是所有CPU核心的运行队列都为1，即所有活动进程都在运行，没有等待。这种状态下服务器运行在负载阈值下。
+
+&emsp;&emsp;通常情况下，按照经验值，服务器的负载应位于阈值的70%~80%，这样既能利用服务器大部分性能，又留有一定的性能冗余应对流量增长。
+
+&emsp;&emsp;Linux提供了很多查看系统负载的命令，最常用的是top和uptime
+
+&emsp;&emsp;top和uptime针对负载的输出内容相同，都是系统最近1分钟、5分钟、15分钟的负载均值
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzTuDhzdppTR4yJrkCIGBx6bS3Nncya7Fgd1TjdrhQBhciceKbvm9KAww/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzblXibqoE7tVxRW826TUvEEGKrWz5RUIdavibLDd1AqFw5yhSTdicNqKpA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+&emsp;&emsp;查看系统负载阈值的命令如下:
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzGADzWc1DK8WQ17t7l84CMgs6MXxv9CdLTT1YkNdzq3mnQT5pxyTiaDw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+&emsp;&emsp;在性能测试过程中，系统负载是评价整个系统运行状况最重要的指标之一。通常情况下，压力测试时系统负载应接近但不能超过阈值，并发测试时的系统负载最高不能超过阈值的80%，稳定性测试时，系统负载应在阈值的50%左右。
+
+>网络
+
+&emsp;&emsp;性能测试中网络监控主要包括网络流量、网络连接状态的监控。
+
+######网络流量监控
+
+&emsp;&emsp;可以使用nethogs命令。该命令与top类似，是一个实时交互的命令，运行界面如下:
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzf7icD8FnAGu3CDuXY6Ma7SiazYuHksTexOEKiaQorEyB8Y4PDSS6O5SIg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+&emsp;&emsp;在后台服务性能测试中，对于返回文本结果的服务，并不需要太多关注在流量方面。
+
+######网络连接状态监控
+
+&emsp;&emsp;性能测试中对网络的监控主要是监控网络连接状态的变化和异常。对于使用TCP协议的服务，需要监控服务已建立连接的变化情况（即ESTABLISHED状态的TCP连接）。对于HTTP协议的服务，需要监控被测服务对应进程的网络缓冲区的状态、TIME_WAIT状态的连接数等。Linux自带的很多命令如netstat、ss都支持如上功能。下图是netstat对指定pid进程的监控结果
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzI9WbvW5j9SBLwE0rBmx1cKL4mhHhWiaBsg0Ex082c81MHTStz08Vqpg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+>磁盘IO
+
+&emsp;&emsp;性能测试过程中，如果被测服务对磁盘读写过于频繁，会导致大量请求处于IO等待的状态，系统负载升高，响应时间变长，吞吐量下降。
+
+&emsp;&emsp;Linux下可以用iostat命令来监控磁盘状态，如下图
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzKjANTQdvibJKribXibuyDUqmuEl2ibBH9YGPbxvWfia4blSGT1BoF1TfQYQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+* tps：该设备每秒的传输次数。“一次传输”意思是“一次I/O请求”。多个逻辑请求可能会被合并为“一次I/O请求”。“一次传输”请求的大小是未知的
+
+* kB_read/s：每秒从设备（driveexpressed）读取的数据量，单位为Kilobytes
+
+* kB_wrtn/s：每秒向设备（driveexpressed）写入的数据量，单位为Kilobytes
+
+* kB_read：读取的总数据量，单位为Kilobytes
+
+* kB_wrtn：写入的总数量数据量，单位为Kilobytes
+
+&emsp;&emsp;从iostat的输出中，能够获得系统运行最基本的统计数据。但对于性能测试来说，这些数据不能提供更多的信息。需要加上-x参数
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzfhXewSJBXFnotib9dB84HV8Dvtvv5mhcyGc3C86W84Uic9TdxxPKq79w/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+* rrqm/s：每秒这个设备相关的读取请求有多少被Merge了（当系统调用需要读取数据的时候，VFS将请求发到各个FS，如果FS发现不同的读取请求读取的是相同Block的数据，FS会将这个请求合并Merge）
+
+* wrqm/s：每秒这个设备相关的写入请求有多少被Merge了
+
+* await：每一个IO请求的处理的平均时间（单位是毫秒）
+
+* %util：在统计时间内所有处理IO时间，除以总共统计时间。例如，如果统计间隔1秒，该设备有0.8秒在处理IO，而0.2秒闲置，那么该设备的%util = 0.8/1 = 80%，该参数暗示了设备的繁忙程度。
+
+##常见性能瓶颈
+
+* **吞吐量到上限时系统负载未到阈值**：一般是被测服务分配的系统资源过少导致的。测试过程中如果发现此类情况，可以从ulimit、系统开启的线程数、分配的内存等维度定位问题原因
+
+* **CPU的us和sy不高，但wa很高**：如果被测服务是磁盘IO密集型型服务，wa高属于正常现象。但如果不是此类服务，最可能导致wa高的原因有两个，一是服务对磁盘读写的业务逻辑有问题，读写频率过高，写入数据量过大，如不合理的数据载入策略、log过多等，都有可能导致这种问题。二是服务器内存不足，服务在swap分区不停的换入换出。
+
+* **同一请求的响应时间忽大忽小**：在正常吞吐量下发生此问题，可能的原因有两方面，一是服务对资源的加锁逻辑有问题，导致处理某些请求过程中花了大量的时间等待资源解锁；二是Linux本身分配给服务的资源有限，某些请求需要等待其他请求释放资源后才能继续执行。
+
+* **内存持续上涨**：在吞吐量固定的前提下，如果内存持续上涨，那么很有可能是被测服务存在明显的内存泄漏，需要使用valgrind等内存检查工具进行定位。
+
+##举个 (栗子) 例子
+
+&emsp;&emsp;智能提示服务趴窝了以后，必须立刻对其做性能摸底。根据目前的情况，测试结果中需要提供外部指标和内部指标。
+
+&emsp;&emsp;智能提示服务的架构和每个模块的功能如下图所示:
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzfm9zhXUicnt1libZNak0AKetOOPQFicvRgcEJspfEl1Y4aQribic4ukOOicQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+&emsp;&emsp;从图中我们可以看出，测试前智能提示服务的底层数据服务已经确定了性能上限。因此，本次测试我们的任务是在底层数据服务性能为3500qps的前提下，找到智能提示服务上游各个模块的性能上限。
+
+&emsp;&emsp;一个完整的后台服务性能测试流程如下图所示:
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzBS9BZibu1U4Ezz1uib1ZLn40k8sJ70lBicnDUlUialtN8Tic0Caib5AK6oCg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+>测试前准备：
+
+* 测试数据：由于智能提示已经在线上运行，本次测试使用智能提示趴窝那天的日志作为测试数据
+
+* QPS预估：本次测试就是为了找这个数
+
+* 服务器配置：使用与线上软硬件配置相同的服务器 
+
+>压测过程：
+
+&emsp;&emsp;我们使用Jmeter发送测试数据来模拟用户请求，Jmeter测试配置文件使用的原件如下图所示。从图中可以看出，性能测试的配置文件主要由数据文件配置（线程间共享方式、到达末尾时的行为等）、吞吐量控制、HTTP采样器（域名、端口、HTTP METHOD、请求body等）、响应断言（对返回结果的内容进行校验）。
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzI60Pgzf6gkACmNw3Lo7JVia4uWg3KXu8rypoibwxiaaqonyvfiaoTyGz7Q/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+######数据文件配置
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzgBQfwy8h9u7knWbloSLXtZaiae2H6WoIRQVzlzPgHQtgMW3kKAfHgAQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+######吞吐量控制
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzsbYHESyr7g7JY10CicqKyERY3qZ023VqZvDWEOLeGk2S9ia8iaGeYZsng/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+######HTTP请求采样
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzljDqNpO5Cyx5hPJCsvWKSia6sUGibMEMYmb8n1CNzKIQBscVCrfEfcFA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+######响应断言
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzUeciadqplsSIRXp9YNVicibVYUNlBG2x1gbB04uBum3K4qgTEfrYVq8YA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+* CPU
+
+&emsp;&emsp;在linux中，sar、top、ps等命令都可以对cpu使用情况进行监控。一般来说，最常用的是top命令。top命令的输出如下：
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzia0WbEqf4orPxtoH4TUFrwQ56xvXpMzQoCvEaFl6p0FtKms5iarRicqRQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+&emsp;&emsp;top命令是一个交互式命令，运行后会一直保持在终端并定时刷新。在性能测试中，可以使用如下参数让top命令只运行一次
+
+&emsp;&emsp;```$top –n 1 –b –p ${pid}```
+
+* 服务器负载
+
+&emsp;&emsp;linux中，服务器负载使用uptime命令获取，该命令的输出如下图
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzTuDhzdppTR4yJrkCIGBx6bS3Nncya7Fgd1TjdrhQBhciceKbvm9KAww/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+&emsp;&emsp;每一列的含义如下：
+
+&emsp;&emsp;```“当前时间 系统运行时长 登录的用户数最 近1分钟、5分钟、15分钟的平均负载”```
+
+* 内存
+
+&emsp;&emsp;在linux中， top、ps命令都可以对指定进程的内存使用状况进行查看。但最准确的信息在/proc/${PID}/status中，如下图
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRz3XhLZLicFfxGxEF7wzCv1gtIcfCKrYuszxsNusfLu5BO30v0urVGlbQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+&emsp;&emsp;上面命令的输出中，我们重点关注VmRSS、VmData、VmSize
+
+*  磁盘IO
+
+&emsp;&emsp;磁盘监控数据使用iostat命令获取:
+
+![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzyzOibYMq2MFSCaPFUPqRrjTCOP6S6iavW6oEScUagO9LlryicAKcOkibmQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+
+>测试报告输出
+
+&emsp;&emsp;在统计完性能测试过程中收集的监控指标后，就可以输出性能报告了。
+
+&emsp;&emsp;通常来说，性能报告中要包含如下内容：
+
+* 测试结论：包括被测服务最大QPS、响应时间等指标是否达到期望，部署建议等。
+
+* 测试环境描述：包括性能需求、测试用服务器配置、测试数据来源、测试方法等
+
+* 监控指标统计：响应时间统计、QPS、服务器指标统计、进程指标统计。建议最好用图表来表示统计数据。 
+
+##结语
+
+&emsp;&emsp;测试完毕后，得出的结论是单台智能提示服务的性能是300qps，线上整套智能提示服务的性能是1800qps；而月黑风高那天的流量大概是5000qps+，难怪智能提示趴窝，确实流量太大，远超线上的吞吐容量。
+
+&emsp;&emsp;最后，智能提示服务申请了服务器进行扩容，并对某打车平台的流量进行了限制，既开源又节流，保证今后月黑风高之夜一众约酒、约饭、约P之人的打车体验，提高了各种约的成功率，可谓功德无量。
+
+
+
+
+
+
+
+
+
