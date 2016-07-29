@@ -13,7 +13,7 @@ tags:
 > “xing. ”
 
 &emsp;&emsp;某月黑风高之夜，某打车平台上线了一大波（G+）优惠活动，众人纷纷下单。于是乎，该打车平台使用的智能提示服务扛不住直接趴窝了（如下图）。事后，负责智能提示服务开发和运维的有关部门开会后决定：必须对智能提示服务进行一次全面深入的性能摸底，立刻！现在！马上！
-![aa](http://7xwwww.com1.z0.glb.clouddn.com/QQ%E6%88%AA%E5%9B%BE20160729102446.png)
+![aa](http://7xwwww.com1.z0.glb.clouddn.com/1.png)
 
 &emsp;&emsp;那么一大坨问题就迎面而来：对于智能提示这样的后台服务，性能测试过程中应该关心那些指标？这些指标代表什么含义？这些指标的通过标准是什么？下面将为您一一解答。
 
@@ -34,7 +34,7 @@ tags:
 
 &emsp;&emsp;对于响应时间的统计，应从均值、.90、.99、分布等多个角度统计，而不仅仅是给出均值。下图是响应时间统计的一个例子
 
-![a](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzk7bmV6vibCiafQFJuK5xvM7iajOnFoX3ZJpMs0wiakqzIVibtbIoiaib2cVyA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![a](http://7xwwww.com1.z0.glb.clouddn.com/2.jpg)
 
 &emsp;&emsp;吞吐量的指标受到响应时间、服务器软硬件配置、网络状态等多方面因素影响。
 
@@ -67,7 +67,7 @@ tags:
 
 &emsp;&emsp;下图是线上开放平台转发服务某台服务器上top命令的输出，下面以这个服务为例对CPU各项指标进行说明.
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzBuUYpAEiayPOgcwy0NbEVLcGHc3KG9j6tPqiaiaScN3kTfWQBPCNrHlVQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/3.png)
 
 &emsp;&emsp;us & sy：大部分后台服务使用的CPU时间片中us和sy的占用比例是最高的。同时这两个指标又是互相影响的，us的比例高了，sy的比例就低，反之亦然。通常sy比例过高意味着被测服务在用户态和系统态之间切换比较频繁，此时系统整体性能会有一定下降。另外，在使用多核CPU的服务器上，CPU 0负责CPU各核间的调度，CPU 0上的使用率过高会导致其他CPU核心之间的调度效率变低。因此测试过程中CPU 0需要重点关注。
 
@@ -85,7 +85,7 @@ tags:
 
 &emsp;&emsp;在Linux系统中有多个命令可以获取指定进程的内存使用情况，最常用的是top命令，如下图所示
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzor2cnuUkXBErptD0HT1wRHXH1NUWuBvtLjeyUhxCpDe8yiarXh6rQsA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/4.png)
 
 
 * VIRT：进程所使用的虚拟内存的总数。它包括所有的代码，数据和共享库，加上已换出的页面，所有已申请的总内存空间
@@ -112,13 +112,13 @@ tags:
 
 &emsp;&emsp;top和uptime针对负载的输出内容相同，都是系统最近1分钟、5分钟、15分钟的负载均值
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzTuDhzdppTR4yJrkCIGBx6bS3Nncya7Fgd1TjdrhQBhciceKbvm9KAww/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/5.png)
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzblXibqoE7tVxRW826TUvEEGKrWz5RUIdavibLDd1AqFw5yhSTdicNqKpA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/6.png)
 
 &emsp;&emsp;查看系统负载阈值的命令如下:
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzGADzWc1DK8WQ17t7l84CMgs6MXxv9CdLTT1YkNdzq3mnQT5pxyTiaDw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/7.png)
 
 &emsp;&emsp;在性能测试过程中，系统负载是评价整个系统运行状况最重要的指标之一。通常情况下，压力测试时系统负载应接近但不能超过阈值，并发测试时的系统负载最高不能超过阈值的80%，稳定性测试时，系统负载应在阈值的50%左右。
 
@@ -130,7 +130,7 @@ tags:
 
 &emsp;&emsp;可以使用nethogs命令。该命令与top类似，是一个实时交互的命令，运行界面如下:
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzf7icD8FnAGu3CDuXY6Ma7SiazYuHksTexOEKiaQorEyB8Y4PDSS6O5SIg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/8.jpg)
 
 &emsp;&emsp;在后台服务性能测试中，对于返回文本结果的服务，并不需要太多关注在流量方面。
 
@@ -138,7 +138,7 @@ tags:
 
 &emsp;&emsp;性能测试中对网络的监控主要是监控网络连接状态的变化和异常。对于使用TCP协议的服务，需要监控服务已建立连接的变化情况（即ESTABLISHED状态的TCP连接）。对于HTTP协议的服务，需要监控被测服务对应进程的网络缓冲区的状态、TIME_WAIT状态的连接数等。Linux自带的很多命令如netstat、ss都支持如上功能。下图是netstat对指定pid进程的监控结果
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzI9WbvW5j9SBLwE0rBmx1cKL4mhHhWiaBsg0Ex082c81MHTStz08Vqpg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/9.jpg)
 
 >磁盘IO
 
@@ -146,7 +146,7 @@ tags:
 
 &emsp;&emsp;Linux下可以用iostat命令来监控磁盘状态，如下图
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzKjANTQdvibJKribXibuyDUqmuEl2ibBH9YGPbxvWfia4blSGT1BoF1TfQYQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/10.jpg)
 
 * tps：该设备每秒的传输次数。“一次传输”意思是“一次I/O请求”。多个逻辑请求可能会被合并为“一次I/O请求”。“一次传输”请求的大小是未知的
 
@@ -160,7 +160,7 @@ tags:
 
 &emsp;&emsp;从iostat的输出中，能够获得系统运行最基本的统计数据。但对于性能测试来说，这些数据不能提供更多的信息。需要加上-x参数
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzfhXewSJBXFnotib9dB84HV8Dvtvv5mhcyGc3C86W84Uic9TdxxPKq79w/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/11.jpg)
 
 * rrqm/s：每秒这个设备相关的读取请求有多少被Merge了（当系统调用需要读取数据的时候，VFS将请求发到各个FS，如果FS发现不同的读取请求读取的是相同Block的数据，FS会将这个请求合并Merge）
 
@@ -186,13 +186,13 @@ tags:
 
 &emsp;&emsp;智能提示服务的架构和每个模块的功能如下图所示:
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzfm9zhXUicnt1libZNak0AKetOOPQFicvRgcEJspfEl1Y4aQribic4ukOOicQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/12.jpg)
 
 &emsp;&emsp;从图中我们可以看出，测试前智能提示服务的底层数据服务已经确定了性能上限。因此，本次测试我们的任务是在底层数据服务性能为3500qps的前提下，找到智能提示服务上游各个模块的性能上限。
 
 &emsp;&emsp;一个完整的后台服务性能测试流程如下图所示:
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzBS9BZibu1U4Ezz1uib1ZLn40k8sJ70lBicnDUlUialtN8Tic0Caib5AK6oCg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/13.jpg)
 
 >测试前准备：
 
@@ -206,29 +206,30 @@ tags:
 
 &emsp;&emsp;我们使用Jmeter发送测试数据来模拟用户请求，Jmeter测试配置文件使用的原件如下图所示。从图中可以看出，性能测试的配置文件主要由数据文件配置（线程间共享方式、到达末尾时的行为等）、吞吐量控制、HTTP采样器（域名、端口、HTTP METHOD、请求body等）、响应断言（对返回结果的内容进行校验）。
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzI60Pgzf6gkACmNw3Lo7JVia4uWg3KXu8rypoibwxiaaqonyvfiaoTyGz7Q/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/14.png)
 
 **数据文件配置**
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzgBQfwy8h9u7knWbloSLXtZaiae2H6WoIRQVzlzPgHQtgMW3kKAfHgAQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/15.png)
 
 **吞吐量控制**
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzsbYHESyr7g7JY10CicqKyERY3qZ023VqZvDWEOLeGk2S9ia8iaGeYZsng/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/16.png)
 
 ***HTTP请求采样
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzljDqNpO5Cyx5hPJCsvWKSia6sUGibMEMYmb8n1CNzKIQBscVCrfEfcFA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/17.png)
 
 **响应断言**
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzUeciadqplsSIRXp9YNVicibVYUNlBG2x1gbB04uBum3K4qgTEfrYVq8YA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/18.png)
 
 * CPU
 
 &emsp;&emsp;在linux中，sar、top、ps等命令都可以对cpu使用情况进行监控。一般来说，最常用的是top命令。top命令的输出如下：
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzia0WbEqf4orPxtoH4TUFrwQ56xvXpMzQoCvEaFl6p0FtKms5iarRicqRQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/19.png)
+
 &emsp;&emsp;top命令是一个交互式命令，运行后会一直保持在终端并定时刷新。在性能测试中，可以使用如下参数让top命令只运行一次
 
 &emsp;&emsp;```$top –n 1 –b –p ${pid}```
@@ -237,7 +238,7 @@ tags:
 
 &emsp;&emsp;linux中，服务器负载使用uptime命令获取，该命令的输出如下图
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzTuDhzdppTR4yJrkCIGBx6bS3Nncya7Fgd1TjdrhQBhciceKbvm9KAww/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/20.png)
 &emsp;&emsp;每一列的含义如下：
 
 &emsp;&emsp;```“当前时间 系统运行时长 登录的用户数最 近1分钟、5分钟、15分钟的平均负载”```
@@ -246,7 +247,7 @@ tags:
 
 &emsp;&emsp;在linux中， top、ps命令都可以对指定进程的内存使用状况进行查看。但最准确的信息在/proc/${PID}/status中，如下图
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRz3XhLZLicFfxGxEF7wzCv1gtIcfCKrYuszxsNusfLu5BO30v0urVGlbQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/21.jpg)
 
 &emsp;&emsp;上面命令的输出中，我们重点关注VmRSS、VmData、VmSize
 
@@ -254,7 +255,7 @@ tags:
 
 &emsp;&emsp;磁盘监控数据使用iostat命令获取:
 
-![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzyzOibYMq2MFSCaPFUPqRrjTCOP6S6iavW6oEScUagO9LlryicAKcOkibmQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
+![](http://7xwwww.com1.z0.glb.clouddn.com/22.jpg)
 
 >测试报告输出
 
