@@ -17,12 +17,12 @@ tags:
 
 &emsp;&emsp;那么一大坨问题就迎面而来：对于智能提示这样的后台服务，性能测试过程中应该关心那些指标？这些指标代表什么含义？这些指标的通过标准是什么？下面将为您一一解答。
 
-##概述
+**概述**
 &emsp;&emsp;不同人群关注的性能指标各有侧重。后台服务接口的调用者一般只关心吞吐量、响应时间等外部指标。后台服务的所有者不仅仅关注外部指标，还会关注CPU、内存、负载等内部指标。
 
 &emsp;&emsp;拿某打车平台来说，它所关心的是智能提示的外部指标能不能抗住因大波优惠所导致的流量激增。而对于智能提示服务的开发、运维、测试人员，不仅仅关注外部指标，还会关注CPU、内存、IO等内部指标，以及部署方式、服务器软硬件配置等运维相关事项。
 
-##外部指标
+**外部指标**
 从外部看，性能测试主要关注如下三个指标:
 
 * 吞吐量：每秒钟系统能够处理的请求数、任务数。
@@ -47,7 +47,7 @@ tags:
 
 &emsp;&emsp;错误率和服务的具体实现有关。通常情况下，由于网络超时等外部原因造成的错误比例不应超过5%%，由于服务本身导致的错误率不应超过1% 。
 
-##内部指标
+**内部指标**
 
 &emsp;&emsp;从服务器的角度看，性能测试主要关注CPU、内存、服务器负载、网络、磁盘IO等
 >CPU
@@ -125,7 +125,7 @@ tags:
 
 &emsp;&emsp;性能测试中网络监控主要包括网络流量、网络连接状态的监控。
 
-######网络流量监控
+**网络流量监控**
 
 &emsp;&emsp;可以使用nethogs命令。该命令与top类似，是一个实时交互的命令，运行界面如下:
 
@@ -133,7 +133,7 @@ tags:
 
 &emsp;&emsp;在后台服务性能测试中，对于返回文本结果的服务，并不需要太多关注在流量方面。
 
-######网络连接状态监控
+**网络连接状态监控**
 
 &emsp;&emsp;性能测试中对网络的监控主要是监控网络连接状态的变化和异常。对于使用TCP协议的服务，需要监控服务已建立连接的变化情况（即ESTABLISHED状态的TCP连接）。对于HTTP协议的服务，需要监控被测服务对应进程的网络缓冲区的状态、TIME_WAIT状态的连接数等。Linux自带的很多命令如netstat、ss都支持如上功能。下图是netstat对指定pid进程的监控结果
 
@@ -169,7 +169,7 @@ tags:
 
 * %util：在统计时间内所有处理IO时间，除以总共统计时间。例如，如果统计间隔1秒，该设备有0.8秒在处理IO，而0.2秒闲置，那么该设备的%util = 0.8/1 = 80%，该参数暗示了设备的繁忙程度。
 
-##常见性能瓶颈
+**常见性能瓶颈**
 
 * **吞吐量到上限时系统负载未到阈值**：一般是被测服务分配的系统资源过少导致的。测试过程中如果发现此类情况，可以从ulimit、系统开启的线程数、分配的内存等维度定位问题原因
 
@@ -179,7 +179,7 @@ tags:
 
 * **内存持续上涨**：在吞吐量固定的前提下，如果内存持续上涨，那么很有可能是被测服务存在明显的内存泄漏，需要使用valgrind等内存检查工具进行定位。
 
-##举个 (栗子) 例子
+**举个 (栗子) 例子**
 
 &emsp;&emsp;智能提示服务趴窝了以后，必须立刻对其做性能摸底。根据目前的情况，测试结果中需要提供外部指标和内部指标。
 
@@ -207,19 +207,19 @@ tags:
 
 ![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzI60Pgzf6gkACmNw3Lo7JVia4uWg3KXu8rypoibwxiaaqonyvfiaoTyGz7Q/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
 
-######数据文件配置
+**数据文件配置**
 
 ![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzgBQfwy8h9u7knWbloSLXtZaiae2H6WoIRQVzlzPgHQtgMW3kKAfHgAQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
 
-######吞吐量控制
+**吞吐量控制**
 
 ![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzsbYHESyr7g7JY10CicqKyERY3qZ023VqZvDWEOLeGk2S9ia8iaGeYZsng/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
 
-######HTTP请求采样
+***HTTP请求采样
 
 ![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzljDqNpO5Cyx5hPJCsvWKSia6sUGibMEMYmb8n1CNzKIQBscVCrfEfcFA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
 
-######响应断言
+**响应断言**
 
 ![](http://mmbiz.qpic.cn/mmbiz/ibLFqdXAia0jfJHbF8XtkSApzYIFUKZsRzUeciadqplsSIRXp9YNVicibVYUNlBG2x1gbB04uBum3K4qgTEfrYVq8YA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1)
 
@@ -267,7 +267,7 @@ tags:
 
 * 监控指标统计：响应时间统计、QPS、服务器指标统计、进程指标统计。建议最好用图表来表示统计数据。 
 
-##结语
+**结语**
 
 &emsp;&emsp;测试完毕后，得出的结论是单台智能提示服务的性能是300qps，线上整套智能提示服务的性能是1800qps；而月黑风高那天的流量大概是5000qps+，难怪智能提示趴窝，确实流量太大，远超线上的吞吐容量。
 
