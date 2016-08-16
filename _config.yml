@@ -101,6 +101,9 @@ friends: [
     },{
         title: "CloudApp",
         href: "https://www.getcloudapp.com/"
+    },{
+        title: "TMQ",
+        href: "http://tmq.qq.com/"
     }
     
 ]
