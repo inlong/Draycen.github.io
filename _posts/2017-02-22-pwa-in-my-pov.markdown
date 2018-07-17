@@ -7,7 +7,7 @@ author:     "Draycen"
 header-img: "img/post-bg-2015.jpg"
 catalog: true
 tags:
-    - 自动化测试
+    - 自动化测试
 ---
 
 > “测试”
