@@ -17,7 +17,7 @@ tags:
 &emsp;&emsp;今天是樱桃去姥姥家第二天，很是想念。现在屋子里就我一人，不知道干点什么。
 
 
-![yt](http://m.qpic.cn/psb?/V12UV68i0XOT3c/sXANmfx5zdUUHLkv6JxRU6EHFMhk1DexoZijH1jFBUw!/b/dN8AAAAAAAAA&bo=0ALAAwAAAAARFzE!&rf=viewer_4)
+![avatar](/img/in-post/20180717.jpg)
 
 
 
