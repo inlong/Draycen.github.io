@@ -13,10 +13,10 @@ tags:
 
 > “python ”
 
-&emsp;&emsp;1. python 获取excel里症状数据。
-&emsp;&emsp;2. python 获取excel里症状对应的疾病描述数据。
-&emsp;&emsp;3. python 获取excel里症状对应分值数据。
-&emsp;&emsp;4. 输入 分值 >=50，的症状，点击疾病描述，看能否推出疾病。
+* python 获取excel里症状数据。
+* python 获取excel里症状对应的疾病描述数据。
+* python 获取excel里症状对应分值数据。
+* 输入 分值 >=50，的症状，点击疾病描述，看能否推出疾病。
 
 ```python
 
